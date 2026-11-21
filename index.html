@@ -3,109 +3,110 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#10131d">
-<title>Conan TV</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0c101b">
+<title>LAYS Anime</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  background: #10131d;
-  color: #fff;
+  background: #0c101b;
+  color: white;
   font-family: -apple-system, Arial, sans-serif;
 }
 
 header {
-  padding: 22px 16px;
-  background: #1b2130;
-  border-bottom: 1px solid #343d50;
+  background: #171d2c;
+  padding: 22px 18px;
+  border-bottom: 1px solid #343b50;
 }
 
-h1 {
+.logo {
   color: #ff4757;
-  margin: 0;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.subtitle {
+  color: #aab5cc;
+  font-size: 13px;
+  margin-top: 7px;
 }
 
 main {
-  max-width: 850px;
+  max-width: 900px;
   margin: auto;
-  padding: 15px;
-}
-
-.panel {
-  background: #1d2433;
   padding: 16px;
-  border-radius: 14px;
-  margin-bottom: 17px;
 }
 
-input {
-  width: 100%;
-  padding: 13px;
-  border: 1px solid #46516a;
-  border-radius: 10px;
-  background: #293246;
-  color: white;
-  font-size: 16px;
+.card {
+  background: #1b2232;
+  border-radius: 16px;
+  padding: 17px;
+  margin-bottom: 18px;
 }
 
-button, .btn {
-  display: inline-block;
-  padding: 11px 14px;
-  background: #ff4757;
-  color: white;
-  border: none;
-  border-radius: 9px;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
+.poster {
+  height: 145px;
+  border-radius: 12px;
+  background: linear-gradient(135deg,#263b67,#101525);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
 }
 
-.episode {
-  background: #252e40;
-  margin-top: 9px;
-  padding: 13px;
-  border-radius: 11px;
+h2 {
+  margin-bottom: 10px;
 }
 
-.name {
-  overflow-wrap: anywhere;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.size, .muted {
-  color: #aab8d0;
+.muted {
+  color: #aab5cc;
   font-size: 13px;
-}
-
-.status {
-  padding: 12px;
-  border-radius: 9px;
-  background: #28364c;
-  overflow-wrap: anywhere;
 }
 
 video {
   width: 100%;
   background: black;
-  border-radius: 10px;
+  border-radius: 12px;
+  aspect-ratio: 16/9;
 }
 
-.row {
+button {
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 18px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.episode {
+  background: #283247;
+  border-radius: 12px;
+  padding: 15px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#status {
+  color: #aab5cc;
+  font-size: 13px;
 }
 
 footer {
   text-align: center;
-  color: #98a6bc;
   padding: 25px;
+  color: #8490a9;
+  font-size: 12px;
 }
 </style>
 </head>
@@ -113,455 +114,91 @@ footer {
 <body>
 
 <header>
-  <h1>▶ CONAN TV</h1>
-  <p class="muted">مكتبة الفيديوهات الخاصة</p>
+  <div class="logo">▶ LAYS ANIME</div>
+  <div class="subtitle">
+    مكتبتك الخاصة لمشاهدة الأنمي
+  </div>
 </header>
 
 <main>
 
-<section class="panel">
-  <h2>حالة المكتبة</h2>
-  <div id="status" class="status">
-    جارٍ قراءة ملف التورنت...
-  </div>
-  <p id="stats" class="muted"></p>
-
-  <a
-    class="btn"
-    href="./Detective%20Conan%202.torrent"
-    download>
-    حفظ ملف التورنت
-  </a>
+<section class="card">
+  <div class="poster">🎬</div>
+  <h2>أنمي LAYS</h2>
+  <p class="muted">عدد الحلقات: 1</p>
 </section>
 
-<section class="panel">
-  <h2>مشغل الفيديو</h2>
+<section class="card">
+  <h2 id="playingTitle">مشغل الحلقات</h2>
 
-  <video id="player"
+  <video
+    id="player"
     controls
     playsinline
     preload="metadata">
   </video>
 
-  <p id="playing" class="muted">
-    لم يتم اختيار فيديو.
+  <p id="status">
+    اختر الحلقة لبدء المشاهدة.
   </p>
-
-  <p class="muted">
-    يمكنك اختيار فيديو محفوظ على جهازك
-    لتجربة تشغيله.
-  </p>
-
-  <input
-    type="file"
-    id="localVideo"
-    accept="video/*,.mkv,.mp4,.webm">
 </section>
 
-<section class="panel">
-  <h2>قائمة الحلقات</h2>
+<section class="card">
+  <h2>الحلقات</h2>
 
-  <input
-    id="search"
-    placeholder="ابحث برقم الحلقة أو اسمها">
+  <div class="episode">
+    <div>
+      <strong>الحلقة 1</strong>
+      <p class="muted">أنمي LAYS</p>
+    </div>
 
-  <p id="count" class="muted"></p>
-  <div id="episodes"></div>
-
-  <button
-    id="more"
-    style="display:none;margin-top:15px">
-    عرض المزيد
-  </button>
+    <button onclick="playEpisode()">
+      ▶ مشاهدة
+    </button>
+  </div>
 </section>
 
 </main>
 
-<footer>Conan TV — Private Library</footer>
+<footer>
+  LAYS Anime — Private Streaming
+</footer>
 
 <script>
-"use strict";
+const videoUrl =
+  "https://rd20.seedr.cc/ff_get/9886660/6027819743/%5BErai-raws%5D%20Marronnier%20Oukoku%20no%20Shichinin%20no%20Kishi%20-%2008%20%5B540p%20AMZN%20WEB-DL%20AVC%20EAC3%5D%5BMultiSub%5D%5BA3D6D87B%5D.mkv?st=V4lLATMDUJNFhGiregWKUQ&e=1795366250";
 
-const torrentFile =
-  "./Detective%20Conan%202.torrent";
+const player = document.getElementById("player");
+const statusEl = document.getElementById("status");
 
-const statusEl =
-  document.getElementById("status");
+function playEpisode() {
+  document.getElementById("playingTitle")
+    .textContent = "أنمي LAYS — الحلقة 1";
 
-const statsEl =
-  document.getElementById("stats");
+  statusEl.textContent = "جاري تحميل الفيديو...";
 
-const episodesEl =
-  document.getElementById("episodes");
+  player.src = videoUrl;
+  player.load();
 
-const searchEl =
-  document.getElementById("search");
-
-const countEl =
-  document.getElementById("count");
-
-const moreBtn =
-  document.getElementById("more");
-
-const player =
-  document.getElementById("player");
-
-let files = [];
-let visibleCount = 40;
-let localObjectUrl = null;
-
-function formatSize(bytes) {
-  if (bytes < 1024) return bytes + " B";
-
-  const units = ["KB", "MB", "GB", "TB"];
-  let value = bytes;
-  let unit = -1;
-
-  do {
-    value /= 1024;
-    unit++;
-  } while (
-    value >= 1024 &&
-    unit < units.length - 1
-  );
-
-  return value.toFixed(1) + " " + units[unit];
-}
-
-/*
-  قارئ Bencode مستقل.
-  لا يحتاج إلى مكتبات خارجية.
-*/
-
-function parseTorrent(buffer) {
-  const data = new Uint8Array(buffer);
-  const decoder = new TextDecoder("utf-8");
-  let pos = 0;
-
-  function parse() {
-    if (pos >= data.length) {
-      throw new Error("ملف تورنت غير مكتمل");
-    }
-
-    const ch = data[pos];
-
-    // Integer
-    if (ch === 105) {
-      pos++;
-      const start = pos;
-
-      while (
-        pos < data.length &&
-        data[pos] !== 101
-      ) pos++;
-
-      if (pos >= data.length) {
-        throw new Error("عدد غير مكتمل");
-      }
-
-      const numberText = decoder.decode(
-        data.subarray(start, pos)
-      );
-
-      pos++;
-
-      const value = Number(numberText);
-
-      if (!Number.isSafeInteger(value)) {
-        throw new Error("عدد غير صالح");
-      }
-
-      return value;
-    }
-
-    // List
-    if (ch === 108) {
-      pos++;
-      const result = [];
-
-      while (
-        pos < data.length &&
-        data[pos] !== 101
-      ) {
-        result.push(parse());
-      }
-
-      if (pos >= data.length) {
-        throw new Error("قائمة غير مكتملة");
-      }
-
-      pos++;
-      return result;
-    }
-
-    // Dictionary
-    if (ch === 100) {
-      pos++;
-      const result = Object.create(null);
-
-      while (
-        pos < data.length &&
-        data[pos] !== 101
-      ) {
-        const key = parse();
-
-        if (!(key instanceof Uint8Array)) {
-          throw new Error("مفتاح غير صالح");
-        }
-
-        const name = decoder.decode(key);
-        result[name] = parse();
-      }
-
-      if (pos >= data.length) {
-        throw new Error("قاموس غير مكتمل");
-      }
-
-      pos++;
-      return result;
-    }
-
-    // Byte string
-    if (ch >= 48 && ch <= 57) {
-      const start = pos;
-
-      while (
-        pos < data.length &&
-        data[pos] !== 58
-      ) pos++;
-
-      if (pos >= data.length) {
-        throw new Error("نص غير مكتمل");
-      }
-
-      const lengthText = decoder.decode(
-        data.subarray(start, pos)
-      );
-
-      const length = Number(lengthText);
-
-      if (
-        !Number.isSafeInteger(length) ||
-        length < 0
-      ) {
-        throw new Error("طول غير صالح");
-      }
-
-      pos++;
-
-      const end = pos + length;
-
-      if (end > data.length) {
-        throw new Error("بيانات غير مكتملة");
-      }
-
-      const result = data.subarray(pos, end);
-      pos = end;
-
-      return result;
-    }
-
-    throw new Error("صيغة Bencode غير صحيحة");
-  }
-
-  const root = parse();
-
-  if (pos !== data.length) {
-    throw new Error("بيانات إضافية غير صالحة");
-  }
-
-  if (!root || !root.info) {
-    throw new Error("لم يتم العثور على معلومات التورنت");
-  }
-
-  const info = root.info;
-
-  const decode = value => {
-    if (!(value instanceof Uint8Array)) {
-      return "";
-    }
-
-    return decoder.decode(value);
-  };
-
-  if (Array.isArray(info.files)) {
-    return info.files.map((file, index) => {
-      const path = file["path.utf-8"] || file.path;
-
-      return {
-        id: index,
-        name: Array.isArray(path)
-          ? path.map(decode).join("/")
-          : "ملف " + (index + 1),
-        size: file.length
-      };
-    });
-  }
-
-  return [{
-    id: 0,
-    name: decode(
-      info["name.utf-8"] || info.name
-    ),
-    size: info.length
-  }];
-}
-
-async function loadTorrent() {
-  statusEl.textContent =
-    "جارٍ تحميل فهرس الملفات...";
-
-  try {
-    const response = await fetch(
-      torrentFile,
-      { cache: "no-store" }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        "تعذر العثور على ملف التورنت. HTTP " +
-        response.status
-      );
-    }
-
-    const buffer = await response.arrayBuffer();
-
-    files = parseTorrent(buffer);
-
-    files = files.filter(file =>
-      /\.(mkv|mp4|webm|mov|avi)$/i.test(
-        file.name
-      )
-    );
-
-    const total = files.reduce(
-      (sum, file) => sum + file.size,
-      0
-    );
-
+  player.play().catch(() => {
     statusEl.textContent =
-      "✓ تم تحميل فهرس الفيديوهات بنجاح";
-
-    statsEl.textContent =
-      files.length +
-      " ملف فيديو — " +
-      formatSize(total);
-
-    renderEpisodes();
-
-  } catch (error) {
-    statusEl.textContent =
-      "فشل قراءة ملف التورنت: " +
-      error.message;
-
-    countEl.textContent =
-      "تأكد أن ملف التورنت موجود بجانب index.html في GitHub.";
-  }
-}
-
-function getFiltered() {
-  const query =
-    searchEl.value.trim().toLowerCase();
-
-  return files.filter(file =>
-    file.name.toLowerCase().includes(query)
-  );
-}
-
-function renderEpisodes() {
-  const filtered = getFiltered();
-
-  episodesEl.replaceChildren();
-
-  countEl.textContent =
-    "عدد النتائج: " + filtered.length;
-
-  const shown = filtered.slice(
-    0,
-    visibleCount
-  );
-
-  shown.forEach(file => {
-    const card = document.createElement("div");
-    card.className = "episode";
-
-    const name = document.createElement("div");
-    name.className = "name";
-    name.textContent = file.name;
-
-    const row = document.createElement("div");
-    row.className = "row";
-
-    const size = document.createElement("span");
-    size.className = "size";
-    size.textContent = formatSize(file.size);
-
-    const button = document.createElement("button");
-    button.textContent = "تفاصيل";
-
-    button.onclick = () => {
-      alert(
-        "اسم الملف:\n" + file.name +
-        "\n\nالحجم:\n" +
-        formatSize(file.size) +
-        "\n\nهذا الملف مفهرس من التورنت، " +
-        "ولم يتم تنزيل الفيديو بعد."
-      );
-    };
-
-    row.append(size, button);
-    card.append(name, row);
-    episodesEl.appendChild(card);
+      "اضغط تشغيل داخل المشغل. إذا لم يعمل، قد تكون صيغة MKV غير مدعومة.";
   });
 
-  moreBtn.style.display =
-    filtered.length > visibleCount
-      ? "block"
-      : "none";
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
-searchEl.addEventListener("input", () => {
-  visibleCount = 40;
-  renderEpisodes();
+player.addEventListener("playing", () => {
+  statusEl.textContent = "يتم تشغيل الحلقة الآن";
 });
-
-moreBtn.addEventListener("click", () => {
-  visibleCount += 40;
-  renderEpisodes();
-});
-
-document.getElementById("localVideo")
-  .addEventListener("change", event => {
-
-    const file = event.target.files[0];
-
-    if (!file) return;
-
-    if (localObjectUrl) {
-      URL.revokeObjectURL(localObjectUrl);
-    }
-
-    localObjectUrl = URL.createObjectURL(file);
-
-    player.src = localObjectUrl;
-
-    document.getElementById("playing")
-      .textContent = file.name;
-
-    player.load();
-
-    player.play().catch(() => {
-      // المستخدم يستطيع الضغط على تشغيل.
-    });
-  });
 
 player.addEventListener("error", () => {
-  document.getElementById("playing")
-    .textContent =
-    "تعذر تشغيل الملف. قد لا يدعم Safari صيغته.";
+  statusEl.textContent =
+    "تعذر تشغيل الفيديو. قد تكون الصيغة غير مدعومة أو انتهت صلاحية الرابط.";
 });
-
-loadTorrent();
 </script>
 
 </body>

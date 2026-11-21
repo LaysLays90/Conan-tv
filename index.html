@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10131d">
+<title>Conan TV</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #10131d;
+  color: white;
+  font-family: -apple-system, Arial, sans-serif;
+}
+
+header {
+  padding: 22px 18px;
+  background: #191e2c;
+  border-bottom: 1px solid #303747;
+}
+
+h1 {
+  color: #ff4757;
+  margin: 0;
+  font-size: 27px;
+}
+
+.subtitle {
+  color: #aab3c5;
+  font-size: 13px;
+  margin-top: 7px;
+}
+
+main {
+  max-width: 850px;
+  margin: auto;
+  padding: 18px;
+}
+
+input, button {
+  font: inherit;
+  border-radius: 10px;
+  padding: 13px;
+}
+
+input {
+  width: 100%;
+  background: #252b3a;
+  border: 1px solid #424b60;
+  color: white;
+  margin-bottom: 10px;
+}
+
+button {
+  background: #ff4757;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.primary {
+  width: 100%;
+}
+
+.panel {
+  background: #1c2230;
+  padding: 16px;
+  border-radius: 15px;
+  margin: 20px 0;
+}
+
+video {
+  width: 100%;
+  background: black;
+  border-radius: 12px;
+  aspect-ratio: 16 / 9;
+}
+
+.episode {
+  background: #242b3b;
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.episode-title {
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.small {
+  padding: 9px;
+  font-size: 13px;
+}
+
+.delete {
+  background: #414859;
+}
+
+.empty {
+  color: #aab3c5;
+  text-align: center;
+  padding: 25px;
+}
+
+#status {
+  color: #b9c8e5;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+footer {
+  text-align: center;
+  padding: 30px;
+  color: #8792a8;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>▶ CONAN TV</h1>
+  <div class="subtitle">
+    مكتبتك الخاصة لمشاهدة الفيديوهات
+  </div>
+</header>
+
+<main>
+
+<section class="panel">
+  <h2 id="nowPlaying">مشغل الفيديو</h2>
+
+  <video
+    id="player"
+    controls
+    playsinline
+    preload="metadata">
+  </video>
+
+  <p id="status">
+    اختر حلقة من المكتبة لبدء المشاهدة.
+  </p>
+</section>
+
+<section class="panel">
+  <h2>إضافة حلقة جديدة</h2>
+
+  <input
+    id="episodeName"
+    placeholder="اسم الحلقة، مثال: الحلقة 1">
+
+  <input
+    id="episodeUrl"
+    type="url"
+    placeholder="رابط الفيديو المباشر HTTPS">
+
+  <button class="primary" onclick="addEpisode()">
+    + إضافة إلى مكتبتي
+  </button>
+</section>
+
+<section>
+  <h2>مكتبة الحلقات</h2>
+
+  <input
+    id="search"
+    placeholder="ابحث عن حلقة..."
+    oninput="renderEpisodes()">
+
+  <div id="episodeList"></div>
+</section>
+
+</main>
+
+<footer>
+  Conan TV — Personal Video Library
+</footer>
+
+<script>
+const STORAGE_KEY = "conan_tv_episodes";
+const LAST_KEY = "conan_tv_last";
+
+let episodes = [];
+
+try {
+  episodes = JSON.parse(
+    localStorage.getItem(STORAGE_KEY) || "[]"
+  );
+
+  if (!Array.isArray(episodes)) {
+    episodes = [];
+  }
+} catch {
+  episodes = [];
+}
+
+const player = document.getElementById("player");
+const statusText = document.getElementById("status");
+const nowPlaying = document.getElementById("nowPlaying");
+
+function saveEpisodes() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(episodes)
+  );
+}
+
+function validUrl(value) {
+  try {
+    const url = new URL(value);
+
+    return (
+      url.protocol === "https:" ||
+      url.protocol === "http:"
+    );
+  } catch {
+    return false;
+  }
+}
+
+function addEpisode() {
+  const name = document
+    .getElementById("episodeName")
+    .value.trim();
+
+  const url = document
+    .getElementById("episodeUrl")
+    .value.trim();
+
+  if (!name || !url) {
+    alert("أدخل اسم الحلقة ورابط الفيديو");
+    return;
+  }
+
+  if (!validUrl(url)) {
+    alert("رابط الفيديو غير صحيح");
+    return;
+  }
+
+  episodes.push({
+    id: Date.now().toString() +
+      Math.random().toString(36).slice(2),
+    name: name,
+    url: url
+  });
+
+  try {
+    saveEpisodes();
+  } catch {
+    alert("تعذر حفظ المكتبة على الجهاز");
+  }
+
+  document.getElementById("episodeName").value = "";
+  document.getElementById("episodeUrl").value = "";
+
+  renderEpisodes();
+}
+
+function playEpisode(id) {
+  const episode = episodes.find(
+    item => item.id === id
+  );
+
+  if (!episode) return;
+
+  player.pause();
+  player.src = episode.url;
+  player.load();
+
+  nowPlaying.textContent = episode.name;
+  statusText.textContent = "جاري تجهيز الفيديو...";
+
+  try {
+    localStorage.setItem(LAST_KEY, JSON.stringify({
+      id: episode.id,
+      time: 0
+    }));
+  } catch {}
+
+  player.play().catch(() => {
+    statusText.textContent =
+      "اضغط زر التشغيل داخل المشغل.";
+  });
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+function deleteEpisode(id) {
+  if (!confirm("هل تريد حذف الحلقة من القائمة؟")) {
+    return;
+  }
+
+  episodes = episodes.filter(
+    item => item.id !== id
+  );
+
+  saveEpisodes();
+  renderEpisodes();
+}
+
+function renderEpisodes() {
+  const search = document
+    .getElementById("search")
+    .value.toLowerCase();
+
+  const list = document.getElementById("episodeList");
+  list.replaceChildren();
+
+  const filtered = episodes.filter(
+    item => item.name.toLowerCase().includes(search)
+  );
+
+  if (filtered.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "لا توجد حلقات حاليًا";
+    list.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(episode => {
+    const card = document.createElement("div");
+    card.className = "episode";
+
+    const title = document.createElement("span");
+    title.className = "episode-title";
+    title.textContent = episode.name;
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const play = document.createElement("button");
+    play.className = "small";
+    play.textContent = "▶ تشغيل";
+    play.onclick = () => playEpisode(episode.id);
+
+    const remove = document.createElement("button");
+    remove.className = "small delete";
+    remove.textContent = "حذف";
+    remove.onclick = () => deleteEpisode(episode.id);
+
+    actions.append(play, remove);
+    card.append(title, actions);
+    list.appendChild(card);
+  });
+}
+
+player.addEventListener("loadedmetadata", () => {
+  statusText.textContent = "الفيديو جاهز للمشاهدة";
+
+  try {
+    const last = JSON.parse(
+      localStorage.getItem(LAST_KEY) || "null"
+    );
+
+    const current = episodes.find(
+      item => item.name === nowPlaying.textContent
+    );
+
+    if (
+      last &&
+      current &&
+      last.id === current.id &&
+      Number.isFinite(last.time) &&
+      last.time < player.duration - 5
+    ) {
+      player.currentTime = last.time;
+    }
+  } catch {}
+});
+
+player.addEventListener("error", () => {
+  statusText.textContent =
+    "تعذر تشغيل الفيديو. تأكد من الرابط والصيغة.";
+});
+
+player.addEventListener("timeupdate", () => {
+  if (!player.duration) return;
+
+  const current = episodes.find(
+    item => item.name === nowPlaying.textContent
+  );
+
+  if (!current) return;
+
+  try {
+    localStorage.setItem(LAST_KEY, JSON.stringify({
+      id: current.id,
+      time: player.currentTime
+    }));
+  } catch {}
+});
+
+renderEpisodes();
+</script>
+
+</body>
+</html>

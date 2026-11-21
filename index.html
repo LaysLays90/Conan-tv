@@ -1,21 +1,568 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101521"><title>Conan TV</title><style>
-*{box-sizing:border-box}body{margin:0;background:#101521;color:#f4f6fb;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif}header{padding:20px;background:#192234;border-bottom:1px solid #354158}h1{margin:0;color:#ff5267;font-size:27px}.sub,.muted{color:#a9b8cd;font-size:13px}main{max-width:850px;margin:auto;padding:15px}.panel{background:#1b2639;border:1px solid #34435b;border-radius:16px;padding:16px;margin-bottom:15px}h2{font-size:19px;margin:0 0 12px}button,input,select{font:inherit;border-radius:10px;padding:12px}button{border:0;background:#ef475e;color:#fff;font-weight:700;cursor:pointer}button:disabled{opacity:.45}input{width:100%;background:#111a29;color:white;border:1px solid #40516b;margin-bottom:12px}.file{border-top:1px solid #35435a;padding:12px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}.name{font-size:14px;overflow-wrap:anywhere}.meta{font-size:12px;color:#9eacc1;margin-top:5px}.controls{display:flex;gap:8px;flex-shrink:0}.controls button{font-size:12px;padding:9px}.secondary{background:#354760}.status{background:#111a29;border-radius:10px;padding:12px;font-size:13px;line-height:1.7;overflow-wrap:anywhere}video{width:100%;background:#000;border-radius:10px;aspect-ratio:16/9}progress{width:100%;height:15px;accent-color:#ef475e}.notice{border-right:3px solid #ffb454;padding:10px;background:#322d27;font-size:13px;line-height:1.8}a{color:#b8d6ff}#count{font-size:13px;color:#afc1d9}footer{text-align:center;color:#8f9db1;font-size:12px;padding:22px}</style></head><body>
-<header><h1>▶ CONAN TV</h1><div class="sub">مكتبة فيديو خاصة • تجربة تورنت داخل المتصفح</div></header><main>
-<section class="panel"><h2>حالة الاتصال</h2><div id="status" class="status">جارٍ تحميل فهرس التورنت...</div><p class="muted">يعتمد التنزيل على وجود مشاركين يدعمون WebRTC. مستخدمو BitTorrent التقليديون وحدهم لا يكفون.</p><a href="./Detective%20Conan%202.torrent" download>حفظ ملف التورنت الأصلي</a></section>
-<section class="panel"><h2 id="playing">مشغل الفيديو</h2><video id="video" controls playsinline preload="metadata"></video><p class="notice">معظم الملفات MKV، وقد لا تعمل في Safari حتى لو اكتمل تنزيلها. زر «حفظ الملف» يحفظ نسخة إذا اكتمل وصولها من الأقران.</p><progress id="progress" value="0" max="100"></progress><div id="progressLabel" class="muted">لم يتم اختيار حلقة</div></section>
-<section class="panel"><h2>قائمة الملفات <span id="count"></span></h2><input id="search" placeholder="ابحث برقم الحلقة أو اسم الملف" aria-label="البحث عن حلقة"><div id="list">جارٍ قراءة القائمة...</div><button id="more" class="secondary" style="display:none;width:100%;margin-top:12px">عرض المزيد</button></section></main><footer>Conan TV — يعمل على GitHub Pages دون استضافة ملفات الفيديو</footer>
-<script src="https://cdn.jsdelivr.net/npm/webtorrent@2/dist/webtorrent.min.js"></script>
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10131d">
+<title>Conan TV</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #10131d;
+  color: #fff;
+  font-family: -apple-system, Arial, sans-serif;
+}
+
+header {
+  padding: 22px 16px;
+  background: #1b2130;
+  border-bottom: 1px solid #343d50;
+}
+
+h1 {
+  color: #ff4757;
+  margin: 0;
+}
+
+main {
+  max-width: 850px;
+  margin: auto;
+  padding: 15px;
+}
+
+.panel {
+  background: #1d2433;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 17px;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #46516a;
+  border-radius: 10px;
+  background: #293246;
+  color: white;
+  font-size: 16px;
+}
+
+button, .btn {
+  display: inline-block;
+  padding: 11px 14px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.episode {
+  background: #252e40;
+  margin-top: 9px;
+  padding: 13px;
+  border-radius: 11px;
+}
+
+.name {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.size, .muted {
+  color: #aab8d0;
+  font-size: 13px;
+}
+
+.status {
+  padding: 12px;
+  border-radius: 9px;
+  background: #28364c;
+  overflow-wrap: anywhere;
+}
+
+video {
+  width: 100%;
+  background: black;
+  border-radius: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+footer {
+  text-align: center;
+  color: #98a6bc;
+  padding: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>▶ CONAN TV</h1>
+  <p class="muted">مكتبة الفيديوهات الخاصة</p>
+</header>
+
+<main>
+
+<section class="panel">
+  <h2>حالة المكتبة</h2>
+  <div id="status" class="status">
+    جارٍ قراءة ملف التورنت...
+  </div>
+  <p id="stats" class="muted"></p>
+
+  <a
+    class="btn"
+    href="./Detective%20Conan%202.torrent"
+    download>
+    حفظ ملف التورنت
+  </a>
+</section>
+
+<section class="panel">
+  <h2>مشغل الفيديو</h2>
+
+  <video id="player"
+    controls
+    playsinline
+    preload="metadata">
+  </video>
+
+  <p id="playing" class="muted">
+    لم يتم اختيار فيديو.
+  </p>
+
+  <p class="muted">
+    يمكنك اختيار فيديو محفوظ على جهازك
+    لتجربة تشغيله.
+  </p>
+
+  <input
+    type="file"
+    id="localVideo"
+    accept="video/*,.mkv,.mp4,.webm">
+</section>
+
+<section class="panel">
+  <h2>قائمة الحلقات</h2>
+
+  <input
+    id="search"
+    placeholder="ابحث برقم الحلقة أو اسمها">
+
+  <p id="count" class="muted"></p>
+  <div id="episodes"></div>
+
+  <button
+    id="more"
+    style="display:none;margin-top:15px">
+    عرض المزيد
+  </button>
+</section>
+
+</main>
+
+<footer>Conan TV — Private Library</footer>
+
 <script>
-const $=id=>document.getElementById(id),status=$('status'),list=$('list'),video=$('video');
-let client=null,torrent=null,files=[],chosen=null,visible=60,lastUrl=null;
-function state(s){status.textContent=s}
-function fmt(n){return n>=1e9?(n/1e9).toFixed(2)+' GB':(n/1e6).toFixed(1)+' MB'}
-function safeName(f){return f.path||f.name||'ملف غير معروف'}
-function show(){let q=$('search').value.trim().toLowerCase();let filtered=files.filter(f=>safeName(f).toLowerCase().includes(q));$('count').textContent=`(${filtered.length} من ${files.length})`;list.replaceChildren();for(const f of filtered.slice(0,visible)){let row=document.createElement('div');row.className='file';let info=document.createElement('div');info.style.minWidth='0';let name=document.createElement('div');name.className='name';name.textContent=f.name;let meta=document.createElement('div');meta.className='meta';meta.textContent=fmt(f.length)+' • '+(f.downloaded?Math.round(f.downloaded/f.length*100)+'%':'0%');info.append(name,meta);let controls=document.createElement('div');controls.className='controls';let play=document.createElement('button');play.textContent='اختيار';play.onclick=()=>selectFile(f);controls.append(play);row.append(info,controls);list.append(row)}$('more').style.display=filtered.length>visible?'block':'none'}
-function selectFile(f){if(!torrent){state('لم يكتمل تحميل فهرس التورنت');return}if(chosen&&chosen!==f){try{chosen.deselect()}catch(e){}}chosen=f;try{f.select()}catch(e){}$('playing').textContent=f.name;video.pause();video.removeAttribute('src');video.load();$('progress').value=0;$('progressLabel').textContent='تم اختيار '+f.name+' — بانتظار بيانات من مشاركين متوافقين';state('عدد الأقران المتصلين: '+torrent.numPeers+'. إذا بقي صفرًا فلن يبدأ التنزيل.');
-let old=$('save');if(old)old.remove();let save=document.createElement('button');save.id='save';save.textContent='حفظ الملف بعد اكتمال التنزيل';save.style.marginTop='12px';save.onclick=()=>{if(f.downloaded<f.length){alert('لم يكتمل تنزيل الملف بعد');return}state('جارٍ تجهيز الملف للحفظ...');f.getBlobURL((err,url)=>{if(err){state('تعذر تجهيز الملف: '+err.message);return}if(lastUrl)URL.revokeObjectURL(lastUrl);lastUrl=url;let a=document.createElement('a');a.href=url;a.download=f.name;document.body.appendChild(a);a.click();a.remove();state('تم إرسال الملف إلى التنزيلات')})};$('progressLabel').after(save);
-// Attempt playback only for a format Safari can generally handle.
-if(/\.(mp4|m4v|mov)$/i.test(f.name)){try{f.streamTo(video,{autoplay:false},err=>{if(err)state('تعذر تشغيل الفيديو: '+err.message)})}catch(e){state('تعذر بدء المشغل: '+e.message)}}else{state('تم اختيار ملف MKV. سيحاول WebTorrent تنزيله، لكن Safari غالبًا لا يشغله مباشرة.')} }
-$('search').addEventListener('input',()=>{visible=60;show()});$('more').onclick=()=>{visible+=60;show()};
-async function init(){try{let response=await fetch('./Detective%20Conan%202.torrent');if(!response.ok)throw Error('تعذر تحميل ملف التورنت من الموقع');let data=new Uint8Array(await response.arrayBuffer());if(!window.WebTorrent)throw Error('تعذر تحميل مكتبة WebTorrent من الإنترنت');client=new WebTorrent();client.on('error',e=>state('خطأ في WebTorrent: '+e.message));state('تم تحميل ملف التورنت، جارٍ قراءة فهرس الملفات...');torrent=client.add(data,{path:'/conan-tv'});torrent.on('error',e=>state('خطأ في التورنت: '+e.message));torrent.on('warning',e=>console.warn(e));torrent.on('ready',()=>{files=torrent.files.filter(f=>/\.(mkv|mp4|mov|m4v|avi|webm)$/i.test(f.name));torrent.files.forEach(f=>{try{f.deselect()}catch(e){}});state('تمت قراءة '+files.length+' ملف فيديو. عدد الأقران: '+torrent.numPeers+'. اختر حلقة لتجربة التنزيل.');show()});setInterval(()=>{if(!torrent)return;if(chosen){let pct=chosen.length?chosen.downloaded/chosen.length*100:0;$('progress').value=pct;$('progressLabel').textContent=`${pct.toFixed(1)}% • ${fmt(chosen.downloaded)} / ${fmt(chosen.length)} • أقران: ${torrent.numPeers} • سرعة: ${fmt(torrent.downloadSpeed||0)}/ثانية`;}if(files.length)show()},6000)}catch(e){state('فشل الإعداد: '+e.message)}}init();
-</script></body></html>
+"use strict";
+
+const torrentFile =
+  "./Detective%20Conan%202.torrent";
+
+const statusEl =
+  document.getElementById("status");
+
+const statsEl =
+  document.getElementById("stats");
+
+const episodesEl =
+  document.getElementById("episodes");
+
+const searchEl =
+  document.getElementById("search");
+
+const countEl =
+  document.getElementById("count");
+
+const moreBtn =
+  document.getElementById("more");
+
+const player =
+  document.getElementById("player");
+
+let files = [];
+let visibleCount = 40;
+let localObjectUrl = null;
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + " B";
+
+  const units = ["KB", "MB", "GB", "TB"];
+  let value = bytes;
+  let unit = -1;
+
+  do {
+    value /= 1024;
+    unit++;
+  } while (
+    value >= 1024 &&
+    unit < units.length - 1
+  );
+
+  return value.toFixed(1) + " " + units[unit];
+}
+
+/*
+  قارئ Bencode مستقل.
+  لا يحتاج إلى مكتبات خارجية.
+*/
+
+function parseTorrent(buffer) {
+  const data = new Uint8Array(buffer);
+  const decoder = new TextDecoder("utf-8");
+  let pos = 0;
+
+  function parse() {
+    if (pos >= data.length) {
+      throw new Error("ملف تورنت غير مكتمل");
+    }
+
+    const ch = data[pos];
+
+    // Integer
+    if (ch === 105) {
+      pos++;
+      const start = pos;
+
+      while (
+        pos < data.length &&
+        data[pos] !== 101
+      ) pos++;
+
+      if (pos >= data.length) {
+        throw new Error("عدد غير مكتمل");
+      }
+
+      const numberText = decoder.decode(
+        data.subarray(start, pos)
+      );
+
+      pos++;
+
+      const value = Number(numberText);
+
+      if (!Number.isSafeInteger(value)) {
+        throw new Error("عدد غير صالح");
+      }
+
+      return value;
+    }
+
+    // List
+    if (ch === 108) {
+      pos++;
+      const result = [];
+
+      while (
+        pos < data.length &&
+        data[pos] !== 101
+      ) {
+        result.push(parse());
+      }
+
+      if (pos >= data.length) {
+        throw new Error("قائمة غير مكتملة");
+      }
+
+      pos++;
+      return result;
+    }
+
+    // Dictionary
+    if (ch === 100) {
+      pos++;
+      const result = Object.create(null);
+
+      while (
+        pos < data.length &&
+        data[pos] !== 101
+      ) {
+        const key = parse();
+
+        if (!(key instanceof Uint8Array)) {
+          throw new Error("مفتاح غير صالح");
+        }
+
+        const name = decoder.decode(key);
+        result[name] = parse();
+      }
+
+      if (pos >= data.length) {
+        throw new Error("قاموس غير مكتمل");
+      }
+
+      pos++;
+      return result;
+    }
+
+    // Byte string
+    if (ch >= 48 && ch <= 57) {
+      const start = pos;
+
+      while (
+        pos < data.length &&
+        data[pos] !== 58
+      ) pos++;
+
+      if (pos >= data.length) {
+        throw new Error("نص غير مكتمل");
+      }
+
+      const lengthText = decoder.decode(
+        data.subarray(start, pos)
+      );
+
+      const length = Number(lengthText);
+
+      if (
+        !Number.isSafeInteger(length) ||
+        length < 0
+      ) {
+        throw new Error("طول غير صالح");
+      }
+
+      pos++;
+
+      const end = pos + length;
+
+      if (end > data.length) {
+        throw new Error("بيانات غير مكتملة");
+      }
+
+      const result = data.subarray(pos, end);
+      pos = end;
+
+      return result;
+    }
+
+    throw new Error("صيغة Bencode غير صحيحة");
+  }
+
+  const root = parse();
+
+  if (pos !== data.length) {
+    throw new Error("بيانات إضافية غير صالحة");
+  }
+
+  if (!root || !root.info) {
+    throw new Error("لم يتم العثور على معلومات التورنت");
+  }
+
+  const info = root.info;
+
+  const decode = value => {
+    if (!(value instanceof Uint8Array)) {
+      return "";
+    }
+
+    return decoder.decode(value);
+  };
+
+  if (Array.isArray(info.files)) {
+    return info.files.map((file, index) => {
+      const path = file["path.utf-8"] || file.path;
+
+      return {
+        id: index,
+        name: Array.isArray(path)
+          ? path.map(decode).join("/")
+          : "ملف " + (index + 1),
+        size: file.length
+      };
+    });
+  }
+
+  return [{
+    id: 0,
+    name: decode(
+      info["name.utf-8"] || info.name
+    ),
+    size: info.length
+  }];
+}
+
+async function loadTorrent() {
+  statusEl.textContent =
+    "جارٍ تحميل فهرس الملفات...";
+
+  try {
+    const response = await fetch(
+      torrentFile,
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "تعذر العثور على ملف التورنت. HTTP " +
+        response.status
+      );
+    }
+
+    const buffer = await response.arrayBuffer();
+
+    files = parseTorrent(buffer);
+
+    files = files.filter(file =>
+      /\.(mkv|mp4|webm|mov|avi)$/i.test(
+        file.name
+      )
+    );
+
+    const total = files.reduce(
+      (sum, file) => sum + file.size,
+      0
+    );
+
+    statusEl.textContent =
+      "✓ تم تحميل فهرس الفيديوهات بنجاح";
+
+    statsEl.textContent =
+      files.length +
+      " ملف فيديو — " +
+      formatSize(total);
+
+    renderEpisodes();
+
+  } catch (error) {
+    statusEl.textContent =
+      "فشل قراءة ملف التورنت: " +
+      error.message;
+
+    countEl.textContent =
+      "تأكد أن ملف التورنت موجود بجانب index.html في GitHub.";
+  }
+}
+
+function getFiltered() {
+  const query =
+    searchEl.value.trim().toLowerCase();
+
+  return files.filter(file =>
+    file.name.toLowerCase().includes(query)
+  );
+}
+
+function renderEpisodes() {
+  const filtered = getFiltered();
+
+  episodesEl.replaceChildren();
+
+  countEl.textContent =
+    "عدد النتائج: " + filtered.length;
+
+  const shown = filtered.slice(
+    0,
+    visibleCount
+  );
+
+  shown.forEach(file => {
+    const card = document.createElement("div");
+    card.className = "episode";
+
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = file.name;
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const size = document.createElement("span");
+    size.className = "size";
+    size.textContent = formatSize(file.size);
+
+    const button = document.createElement("button");
+    button.textContent = "تفاصيل";
+
+    button.onclick = () => {
+      alert(
+        "اسم الملف:\n" + file.name +
+        "\n\nالحجم:\n" +
+        formatSize(file.size) +
+        "\n\nهذا الملف مفهرس من التورنت، " +
+        "ولم يتم تنزيل الفيديو بعد."
+      );
+    };
+
+    row.append(size, button);
+    card.append(name, row);
+    episodesEl.appendChild(card);
+  });
+
+  moreBtn.style.display =
+    filtered.length > visibleCount
+      ? "block"
+      : "none";
+}
+
+searchEl.addEventListener("input", () => {
+  visibleCount = 40;
+  renderEpisodes();
+});
+
+moreBtn.addEventListener("click", () => {
+  visibleCount += 40;
+  renderEpisodes();
+});
+
+document.getElementById("localVideo")
+  .addEventListener("change", event => {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    if (localObjectUrl) {
+      URL.revokeObjectURL(localObjectUrl);
+    }
+
+    localObjectUrl = URL.createObjectURL(file);
+
+    player.src = localObjectUrl;
+
+    document.getElementById("playing")
+      .textContent = file.name;
+
+    player.load();
+
+    player.play().catch(() => {
+      // المستخدم يستطيع الضغط على تشغيل.
+    });
+  });
+
+player.addEventListener("error", () => {
+  document.getElementById("playing")
+    .textContent =
+    "تعذر تشغيل الملف. قد لا يدعم Safari صيغته.";
+});
+
+loadTorrent();
+</script>
+
+</body>
+</html>
